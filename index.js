@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 }));
 
 var defaultRomm = 'global'
-var channels = ['global','users']
+var channels = process.env.ROOMS??[]
 
 server.listen(8000, function() {
     io.emit('initevent')
@@ -64,6 +64,6 @@ io.on('connection', function(socket) {
     socket.join(socket.handshake.query.canal)
 
     console.log("cliente "+ socket.id+"  al canal "+socket.handshake.query.canal)
-    
+
 });
 
