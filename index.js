@@ -7,7 +7,7 @@ const { count } = require('console');
 require('dotenv').config()
 io = require('socket.io')(server,{
     cors:{
-        origin: "*",
+        origin: process.env.DOMAIN_ALLOWED,
         methods: ["GET", "POST"]
     }
 })
