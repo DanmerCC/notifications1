@@ -23,7 +23,7 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 var defaultRomm = 'global'
 var channels = process.env.ROOMS??[]
 
-server.listen(8000, function() {
+server.listen(process.env.LISTEN_PORT??8000, function() {
     io.emit('initevent')
 });
 
