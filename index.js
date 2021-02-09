@@ -54,6 +54,7 @@ app.get('/', (req, res) => {
 app.post('/emit/:channel', cors(corsOptions),(req, res) => {
 
     var reqchannel = req.params.channel.split(',')
+    res.setHeader('Access-Control-Allow-Origin','*')
 
     if(!channels.includes(reqchannel)){
 
