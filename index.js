@@ -4,7 +4,27 @@ var app = express();
 var server = require('http').Server(app);
 var bodyParser = require('body-parser');
 const { count } = require('console');
+var cors = require('cors')
+
 require('dotenv').config()
+
+var whitelist = process.env.DOMAIN_ALLOWED.split(',')
+
+var corsOptions = {
+
+    origin: function (origin, callback) {
+        
+      if (whitelist.indexOf(origin) !== -1 || whitelist.includes('*')) {
+
+        callback(null, true)
+
+      } else {
+
+        callback(new Error('Not allowed by CORS'))
+      }
+    }
+}
+
 io = require('socket.io')(server,{
     cors:{
         origin: process.env.DOMAIN_ALLOWED,
@@ -12,7 +32,6 @@ io = require('socket.io')(server,{
     }
 })
 
-console.log(process.env.ROOMS)
 
 app.use(express.static('public'));
 app.use(express.json());       // to support JSON-encoded bodies
@@ -21,9 +40,9 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 }));
 
 var defaultRomm = 'global'
-var channels = process.env.ROOMS??[]
+var channels = process.env.ROOMS
 
-server.listen(process.env.LISTEN_PORT??8000, function() {
+server.listen(process.env.LISTEN_PORT, function() {
     io.emit('initevent')
 });
 
@@ -32,7 +51,7 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');;
 })
 
-app.post('/emit/:channel', (req, res) => {
+app.post('/emit/:channel', cors(corsOptions),(req, res) => {
 
     var reqchannel = req.params.channel.split(',')
 
@@ -48,7 +67,7 @@ app.post('/emit/:channel', (req, res) => {
         })
     }
 
-    res.send({message:"Enviado"})
+    res.header("Access-Control-Allow-Origin", "*").send({message:"Enviado"})
 
 })
 
