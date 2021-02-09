@@ -67,7 +67,7 @@ app.post('/emit/:channel', cors(corsOptions),(req, res) => {
         })
     }
 
-    res.header("Access-Control-Allow-Origin", "*").send({message:"Enviado"})
+    res.send({message:"Enviado"})
 
 })
 
