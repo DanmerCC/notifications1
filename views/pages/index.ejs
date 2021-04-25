@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket servers</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      .form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      .form input { border: 0; padding: 10px; width: 90%; margin-right: 0.5%; }
+      .form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <div class="form">
+      <input id="m" autocomplete="off" />
+      <button id="btnsend">Send</button>
+    </div>
+      
+    <script src="/socket.io.js"></script>
+    <script>
+        var btnsend = document.getElementById('btnsend')
+        var listmessages = document.getElementById('messages')
+        
+        var cliente_id = prompt("cliente id")
+        var canal = 'log'
+
+        function sendMessage(inner){
+          var newlii = document.createElement('li');
+          console.log(newlii)
+          newlii.innerHTML = inner
+          
+          document.getElementById('messages').appendChild(newlii)
+        }
+        
+        var socket = io("ws://<%=DOMIAN%>:8000",{query:new URLSearchParams({canal,cliente_id}).toString()});
+        console.log(new URLSearchParams({canal,cliente_id}).toString())
+        btnsend.onclick = (event)=>{
+          console.log(document.getElementById('m').value)
+          socket.emit('message',{canal,message:document.getElementById('m').value})
+        }
+        socket.on('connect', function(payload){
+            console.log("conectado")
+            socket.emit('join',canal)
+        });
+        socket.on('createdvideo', function(data){
+            console.log("se creo video");
+            console.log(data);
+        });
+        socket.on('message', function(message){
+          console.log("Recibiendo:",message)
+          sendMessage("Recibiendo:"+message)
+        })
+        socket.on('disconnect', function(){});
+        /*
+        socket.on('message', function(mesage){
+          console.log("Recibiendo desde el otro")
+        });
+        */
+    </script>
+  </body>
+</html>
