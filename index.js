@@ -56,7 +56,7 @@ server.listen(process.env.LISTEN_PORT, function() {
 
 app.get('/', (req, res) => {
     res.render('pages/index',{
-        DOMIAN:'localhost'
+        DOMIAN:process.env.APP_DOMAIN?process.env.APP_DOMAIN:'localhost'
     });
 })
 
