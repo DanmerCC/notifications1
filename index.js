@@ -5,8 +5,12 @@ var server = require('http').Server(app);
 var bodyParser = require('body-parser');
 const { count } = require('console');
 var cors = require('cors');
-const { isObject } = require('util');
+const { isObject } = require('util')
+var dotenv = require('dotenv')
+var dotenvExpand = require('dotenv-expand')
 
+var myEnv = dotenv.config()
+dotenvExpand(myEnv)
 
 require('dotenv').config()
 
@@ -56,7 +60,8 @@ server.listen(process.env.LISTEN_PORT, function() {
 
 app.get('/', (req, res) => {
     res.render('pages/index',{
-        DOMIAN:process.env.APP_DOMAIN?process.env.APP_DOMAIN:'localhost'
+        DOMIAN:process.env.APP_DOMAIN?process.env.APP_DOMAIN:'localhost',
+        FRONTEND_PORT_PART:process.env.FRONTEND_PORT=="80"?"":":"+process.env.FRONTEND_PORT
     });
 })
 

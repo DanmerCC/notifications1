@@ -36,7 +36,7 @@
           document.getElementById('messages').appendChild(newlii)
         }
         
-        var socket = io("ws://<%=DOMIAN%>:8000",{query:new URLSearchParams({canal,cliente_id}).toString()});
+        var socket = io("ws://<%=DOMIAN%><%=FRONTEND_PORT_PART%>",{query:new URLSearchParams({canal,cliente_id}).toString()});
         console.log(new URLSearchParams({canal,cliente_id}).toString())
         btnsend.onclick = (event)=>{
           console.log(document.getElementById('m').value)
