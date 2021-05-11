@@ -4,7 +4,8 @@ var app = express();
 var server = require('http').Server(app);
 var bodyParser = require('body-parser');
 const { count } = require('console');
-var cors = require('cors')
+var cors = require('cors');
+const { isObject } = require('util');
 
 
 require('dotenv').config()
@@ -75,73 +76,47 @@ app.post('/emit/:channel', cors(corsOptions),(req, res) => {
     var reqchannel = req.params.channel.split(',')
     res.setHeader('Access-Control-Allow-Origin','*')
 
-    if(!channels.includes(reqchannel)){
-
-        sockets.emit('errors',{message:'No existe el canal especificado'})
-    }
-
     for (let ii = 0; ii < reqchannel.length; ii++) {
-        io.in(reqchannel[ii]).emit('update:'+reqchannel[ii],{
-            channel:reqchannel[ii],
-            data:req.body
-        })
+        io.in(reqchannel[ii]).emit('message',req.body)
     }
 
     res.send({message:"Enviado"})
 
 })
 
+app.post('/test', cors(corsOptions),(req, res) => {
+
+ io.to('log').emit('message',{message:"test"})
+
+  res.send({message:"Enviado"})
+
+})
+
 io.on('connection', function(socket) {
 
-    var channel;
-    
-    /*if(typeof socket.handshake.query.canal == 'undefined'){
-        channel = [defaultRomm]
-    }else{
-        channel = socket.handshake.query.canal.split(',')
-    }
-    console.log("cliente "+ socket.id+"  al canal "+socket.handshake.query.canal)*/
-
     socket.on('join',(room)=>{
-        console.log(room)
-        if(!channels.includes(room)){
-
-            socket.emit('errors',{message:'No existe el canal especificado'})
-        }else{
-            socket.join(room)
-            socket.emit('log',{message:'Se union al room: '+room})
-        }
-        
+      socket.join(room)
+      socket.emit('log',{message:'Se union al room: '+room})
     })
 
     socket.on('leave',(room)=>{
-        if(!channels.includes(room)){
-
-            socket.emit('errors',{message:'No existe el canal especificado'})
-        }else{
-            socket.leave(room, function(err) {
-                if (typeof io.sockets.adapter.rooms[room] !== 'undefined' && io.sockets.adapter.rooms[room1] != null) {
-                    console.log(io.sockets.adapter.rooms[room].length);
-                    console.log(err)
-                } else{
-                    console.log("room is deleted")
-                    socket.emit('log',{message:'salieron de room: '+room})
-                }
-            })
-        }
+        
+      socket.leave(room, function(err) {
+          if (typeof io.sockets.adapter.rooms[room] !== 'undefined' && io.sockets.adapter.rooms[room] != null) {
+              console.log(io.sockets.adapter.rooms[room].length)
+              console.log(err)
+          } else{
+              console.log("room is deleted")
+              socket.emit('log',{message:'salieron de room: '+room})
+          }
+      })
         
     })
 
-    socket.on('message',({canal,message})=>{
-        console.log(canal)
-        if(!channels.includes(canal)){
-
-            socket.emit('errors',{message:'No existe el canal especificado'})
-        }else{
-            console.log("Enviando correctamente :"+canal)
-            socket.in(canal).emit('message',message)
-            socket.emit('log',{message:'enviando de message: '+message})
-        }
+    socket.on('message',({channel,message})=>{
+        
+      socket.in(channel).emit('message',message)
+      socket.emit('log',{message:'enviando de message: '+message})
         
     })
 

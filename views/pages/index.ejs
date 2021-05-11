@@ -51,8 +51,8 @@
             console.log(data);
         });
         socket.on('message', function(message){
-          console.log("Recibiendo:",message)
-          sendMessage("Recibiendo:"+message)
+          console.log("Recibiendo:",message.message)
+          sendMessage("Recibiendo:"+message.message)
         })
         socket.on('disconnect', function(){});
         /*
